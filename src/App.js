@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Scale, BookOpen, Building2, Award, Mail, Phone, MapPin, GraduationCap, Briefcase, Library, FileText, Users, Shield, ChevronRight, ArrowRight } from 'lucide-react';
 
@@ -14,6 +15,11 @@ const scrollToSection = (id) => {
 const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const pathFor = (id) => (id === 'home' ? '/' : `/${id}`);
+  const isActive = (path) => location.pathname === path;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +30,7 @@ const Navigation = () => {
   }, []);
 
   const navItems = [
+    { label: 'Home', id: 'home' },
     { label: 'About', id: 'about' },
     { label: 'Practice Areas', id: 'practice' },
     { label: 'Experience', id: 'experience' },
@@ -36,7 +43,7 @@ const Navigation = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? 'bg-slate-900/80 backdrop-blur-xl shadow-2xl border-b border-amber-500/10' : 'bg-transparent'
+        scrolled ? 'bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200' : 'bg-transparent'
       }`}
     >
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 md:max-w-7xl">
@@ -45,38 +52,42 @@ const Navigation = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center space-x-3 cursor-pointer group"
-            onClick={() => scrollToSection('hero')}
+            onClick={() => navigate('/')}
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-amber-500 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-              <Scale className="w-8 h-8 text-amber-500 relative z-10" />
+              <div className="absolute inset-0 bg-slate-900 blur-lg opacity-10 group-hover:opacity-20 transition-opacity" />
+              <Scale className="w-8 h-8 text-slate-900 relative z-10" />
             </div>
             <div>
-              <span className="text-xl font-serif text-white block">Dr. Preeti Pathak</span>
-              <span className="text-xs text-amber-500">High Court Advocate</span>
+              <span className="text-2xl md:text-3xl font-serif text-slate-900 block font-bold tracking-tight">Dr. Preeti Pathak</span>
+              <span className="text-xs text-gray-600">High Court Advocate</span>
             </div>
           </motion.div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-1">
-            {navItems.map((item, i) => (
-              <motion.button
-                key={item.id}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                onClick={() => scrollToSection(item.id)}
-                className="px-4 py-2 text-gray-300 hover:text-amber-500 transition-all duration-300 text-sm tracking-wide relative group"
-              >
-                {item.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-300" />
-              </motion.button>
-            ))}
+            {navItems.map((item, i) => {
+              const to = `/${item.id}`;
+              const active = isActive(to);
+              return (
+                <motion.button
+                  key={item.id}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  onClick={() => navigate(to)}
+                  className={`px-4 py-2 ${active ? 'text-slate-900' : 'text-gray-700'} hover:text-slate-900 transition-all duration-300 text-sm tracking-wide relative group`}
+                >
+                  {item.label}
+                  <span className={`absolute bottom-0 left-0 h-0.5 bg-slate-900 transition-all duration-300 ${active ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+                </motion.button>
+              );
+            })}
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white relative z-50"
+            className="md:hidden text-slate-900 relative z-50"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,20 +107,24 @@ const Navigation = () => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="md:hidden bg-slate-900/95 backdrop-blur-xl border-t border-amber-500/10"
+          className="md:hidden bg-white/95 backdrop-blur-sm border-t border-gray-100"
         >
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                scrollToSection(item.id);
-                setMobileMenuOpen(false);
-              }}
-              className="block w-full text-left px-6 py-4 text-gray-300 hover:bg-slate-800/50 hover:text-amber-500 transition-all duration-300 border-b border-slate-800/50"
-            >
-              {item.label}
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const to = `/${item.id}`;
+            const active = isActive(to);
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  navigate(to);
+                  setMobileMenuOpen(false);
+                }}
+                className={`block w-full text-left px-6 py-4 ${active ? 'text-slate-900 bg-gray-100' : 'text-gray-700'} hover:bg-gray-100 hover:text-slate-900 transition-all duration-300 border-b border-gray-100`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </motion.div>
       )}
     </motion.nav>
@@ -123,17 +138,17 @@ const HeroSection = () => {
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
       {/* Animated Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-900/20 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-amber-900/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-white">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900/12 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-slate-900/8 via-transparent to-transparent" />
       </div>
 
       {/* Animated Grid Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
-          backgroundImage: `linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px)`,
           backgroundSize: '50px 50px'
         }} />
       </div>
@@ -142,7 +157,7 @@ const HeroSection = () => {
       {[...Array(20)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 bg-amber-500 rounded-full"
+          className="absolute w-1 h-1 bg-slate-900 rounded-full"
           initial={{ 
             x: Math.random() * window.innerWidth, 
             y: Math.random() * window.innerHeight,
@@ -161,31 +176,17 @@ const HeroSection = () => {
       ))}
 
       <motion.div style={{ y, opacity }} className="relative z-10 text-center px-4 w-full mx-auto md:max-w-6xl">
-        {/* Logo with Glow Effect */}
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-          className="relative inline-block mb-8 mt-2"
-        >
-          <div className="absolute inset-0 bg-amber-500 blur-3xl opacity-50 animate-pulse" />
-          <div className="relative bg-gradient-to-br from-amber-500 to-amber-600 p-4 md:p-6 rounded-full">
-            <Scale className="w-12 h-12 md:w-16 md:h-16 text-slate-900" />
-          </div>
-        </motion.div>
-
         {/* Main Title with Gradient */}
-        <motion.h1
+          <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold mb-4 leading-tight"
+          className="text-3xl md:text-4xl lg:text-6xl font-serif font-bold leading-tight mt-16"
         >
-          <span className="bg-gradient-to-r from-white via-amber-100 to-white bg-clip-text text-transparent">
-            Dr. Preeti Pathak
+          <span className="block text-3xl md:text-5xl lg:text-6xl text-slate-900 font-bold">
+            Dr. Preeti Pathak (Mishra)
           </span>
           <br />
-          <span className="text-3xl md:text-4xl lg:text-5xl text-gray-400">(Mishra)</span>
         </motion.h1>
 
         {/* Subtitle with Underline Effect */}
@@ -195,11 +196,11 @@ const HeroSection = () => {
           transition={{ delay: 0.5, duration: 0.8 }}
           className="space-y-3 mb-12"
         >
-          <div className="inline-block">
-            <p className="text-2xl md:text-3xl text-amber-500 font-semibold mb-2">
+            <div className="inline-block">
+            <p className="text-1xl md:text-2xl text-slate-900 font-semibold mb-2">
               Advocate, High Court of Madhya Pradesh
             </p>
-            <div className="h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
+            <div className="h-1 bg-gradient-to-r from-transparent via-slate-900 to-transparent" />
           </div>
           <p className="text-lg text-gray-400">Enrollment No: 6052/2023 | Jabalpur</p>
         </motion.div>
@@ -212,13 +213,13 @@ const HeroSection = () => {
           className="flex flex-wrap justify-center gap-3 mb-16"
         >
           {['Constitutional Law', 'Service Matters', 'Public Interest Litigation', 'Municipal Governance', 'Civil & Criminal Law'].map((area, i) => (
-            <motion.span
+              <motion.span
               key={area}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.9 + i * 0.1, type: "spring" }}
               whileHover={{ scale: 1.05, y: -2 }}
-              className="px-6 py-3 bg-gradient-to-r from-slate-800 to-slate-900 border border-amber-500/30 text-gray-300 rounded-full text-sm font-medium shadow-lg hover:shadow-amber-500/20 transition-all duration-300 cursor-default"
+              className="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-200 text-slate-900 rounded-full text-sm font-medium shadow-sm hover:shadow-gray-300 transition-all duration-300 cursor-default"
             >
               {area}
             </motion.span>
@@ -236,7 +237,7 @@ const HeroSection = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => scrollToSection('contact')}
-            className="group px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 font-bold rounded-xl hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-2xl shadow-amber-500/30 flex items-center space-x-2"
+            className="group px-8 py-4 bg-gray-100 text-slate-900 font-bold rounded-xl hover:bg-gray-200 transition-all duration-300 shadow-lg flex items-center space-x-2"
           >
             <span>Schedule Consultation</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -246,35 +247,14 @@ const HeroSection = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => scrollToSection('practice')}
-            className="px-8 py-4 bg-transparent border-2 border-amber-500 text-amber-500 font-semibold rounded-xl hover:bg-amber-500 hover:text-slate-900 transition-all duration-300"
+            className="px-8 py-4 bg-transparent border-2 border-gray-300 text-slate-900 font-semibold rounded-xl hover:bg-gray-200 hover:text-slate-900 transition-all duration-300"
           >
             View Practice Areas
           </motion.button>
         </motion.div>
       </motion.div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.8 }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 12, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="flex flex-col items-center space-y-2"
-        >
-          <span className="text-amber-500 text-sm">Scroll to explore</span>
-          <div className="w-6 h-10 border-2 border-amber-500 rounded-full flex items-start justify-center p-2">
-            <motion.div 
-              animate={{ y: [0, 12, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-1.5 h-3 bg-amber-500 rounded-full" 
-            />
-          </div>
-        </motion.div>
-      </motion.div>
+    
     </section>
   );
 };
@@ -282,10 +262,10 @@ const HeroSection = () => {
 // About Section
 const AboutSection = () => {
   return (
-    <section id="about" className="relative py-32 bg-gradient-to-b from-slate-900 to-slate-950 overflow-hidden">
+    <section id="about" className="relative py-32 bg-white overflow-hidden">
       {/* Background Decoration */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gray-200/6 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gray-200/6 rounded-full blur-3xl" />
 
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 md:max-w-7xl relative z-10">
         <motion.div
@@ -303,19 +283,19 @@ const AboutSection = () => {
               viewport={{ once: true }}
               className="inline-block mb-4"
             >
-              <span className="px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-full text-sm font-semibold">
+              <span className="px-4 py-2 bg-gray-100 border border-gray-200 text-slate-900 rounded-full text-sm font-semibold">
                 Professional Profile
               </span>
             </motion.div>
 
-            <h2 className="text-5xl md:text-6xl font-serif font-bold text-white mb-6 leading-tight">
+            <h2 className="text-5xl md:text-6xl font-serif font-bold text-slate-900 mb-6 leading-tight">
               Excellence in
-              <span className="block bg-gradient-to-r from-amber-500 to-amber-300 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
                 Legal Advocacy
               </span>
             </h2>
 
-            <div className="space-y-6 text-gray-300 leading-relaxed text-lg">
+            <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
               <p>
                 With a strong academic foundation spanning multiple disciplines and diverse professional experience, I bring comprehensive expertise in litigation, constitutional law, service matters, and municipal governance.
               </p>
@@ -324,11 +304,11 @@ const AboutSection = () => {
               </p>
               
               {/* Quote Box */}
-              <div className="relative pl-6 border-l-4 border-amber-500 py-4">
-                <div className="absolute -left-3 top-0 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
+              <div className="relative pl-6 border-l-4 border-gray-300 py-4">
+                <div className="absolute -left-3 top-0 w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center">
                   <span className="text-slate-900 text-xs font-bold">"</span>
                 </div>
-                <p className="text-amber-400 font-medium italic text-xl">
+                <p className="text-gray-700 font-medium italic text-xl">
                   Justice delayed is justice denied. I strive to provide timely, effective, and transparent legal representation.
                 </p>
               </div>
@@ -346,16 +326,16 @@ const AboutSection = () => {
             {/* Academic Card */}
             <motion.div
               whileHover={{ scale: 1.02, y: -5 }}
-              className="group relative bg-gradient-to-br from-slate-800 to-slate-900 border border-amber-500/20 rounded-2xl p-8 shadow-2xl hover:shadow-amber-500/20 transition-all duration-300 overflow-hidden"
+              className="group relative bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-gray-300 transition-all duration-300 overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gray-200/6 rounded-full blur-2xl group-hover:bg-gray-200/12 transition-all" />
               <div className="relative z-10">
-                <GraduationCap className="w-14 h-14 text-amber-500 mb-4" />
-                <h3 className="text-2xl font-bold text-white mb-4">Academic Excellence</h3>
+                <GraduationCap className="w-14 h-14 text-slate-900 mb-4" />
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Academic Excellence</h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {['Ph.D. Child Development', 'LL.B. (Law)', 'M.A. English Literature', 'M.H.Sc. Child Development', 'B.Ed. Education', 'PGDCA'].map((degree, i) => (
-                    <div key={i} className="flex items-center space-x-2 text-gray-300">
-                      <ChevronRight className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                    <div key={i} className="flex items-center space-x-2 text-gray-700">
+                      <ChevronRight className="w-4 h-4 text-slate-900 flex-shrink-0" />
                       <span>{degree}</span>
                     </div>
                   ))}
@@ -366,17 +346,17 @@ const AboutSection = () => {
             {/* Values Card */}
             <motion.div
               whileHover={{ scale: 1.02, y: -5 }}
-              className="group relative bg-gradient-to-br from-slate-800 to-slate-900 border border-amber-500/20 rounded-2xl p-8 shadow-2xl hover:shadow-amber-500/20 transition-all duration-300 overflow-hidden"
+              className="group relative bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-gray-300 transition-all duration-300 overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gray-200/6 rounded-full blur-2xl group-hover:bg-gray-200/12 transition-all" />
               <div className="relative z-10">
-                <Shield className="w-14 h-14 text-amber-500 mb-4" />
-                <h3 className="text-2xl font-bold text-white mb-4">Core Values</h3>
+                <Shield className="w-14 h-14 text-slate-900 mb-4" />
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Core Values</h3>
                 <div className="space-y-3">
                   {['Integrity & Ethics', 'Diligence & Dedication', 'Transparency', 'Professionalism'].map((value, i) => (
                     <div key={i} className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-amber-500 rounded-full" />
-                      <span className="text-gray-300">{value}</span>
+                      <div className="w-2 h-2 bg-slate-900 rounded-full" />
+                      <span className="text-gray-700">{value}</span>
                     </div>
                   ))}
                 </div>
@@ -414,7 +394,7 @@ const PracticeAreasSection = () => {
       icon: Building2,
       title: "Municipal Law",
       description: "Extensive experience in panchayat and municipal taxation, electricity disputes, cooperative matters, and local governance issues.",
-      gradient: "from-orange-500/20 to-orange-600/20"
+      gradient: "from-slate-300/20 to-slate-400/20"
     },
     {
       icon: Scale,
@@ -426,12 +406,12 @@ const PracticeAreasSection = () => {
       icon: Users,
       title: "Public Interest Litigation",
       description: "Dedicated advocacy for public welfare, governance accountability, environmental protection, and safeguarding constitutional rights.",
-      gradient: "from-amber-500/20 to-amber-600/20"
+      gradient: "from-slate-900/12 to-slate-800/12"
     }
   ];
 
   return (
-    <section id="practice" className="relative py-32 bg-slate-950">
+    <section id="practice" className="relative py-32 bg-white">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 md:max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -439,10 +419,10 @@ const PracticeAreasSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-full text-sm font-semibold mb-4">
+          <span className="inline-block px-4 py-2 bg-gray-100 border border-gray-200 text-slate-900 rounded-full text-sm font-semibold mb-4">
             Areas of Expertise
           </span>
-          <h2 className="text-5xl md:text-6xl font-serif font-bold text-white mb-6">
+          <h2 className="text-5xl md:text-6xl font-serif font-bold text-slate-900 mb-6">
             Practice Areas
           </h2>
           <p className="text-gray-400 text-lg w-full mx-auto max-w-3xl">
@@ -465,16 +445,16 @@ const PracticeAreasSection = () => {
               <div className={`absolute inset-0 bg-gradient-to-br ${area.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
               
               {/* Card */}
-              <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 group-hover:border-amber-500/50 rounded-2xl p-8 h-full transition-all duration-300 shadow-xl">
+              <div className="relative bg-white border border-gray-200 group-hover:border-gray-300 rounded-2xl p-8 h-full transition-all duration-300 shadow-sm">
                 {/* Icon with Background */}
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-amber-500/10 rounded-2xl blur-xl" />
-                  <div className="relative bg-gradient-to-br from-amber-500/10 to-transparent p-4 rounded-2xl inline-block">
-                    <area.icon className="w-12 h-12 text-amber-500" />
+                  <div className="absolute inset-0 bg-gray-200/6 rounded-2xl blur-xl" />
+                  <div className="relative bg-gradient-to-br from-slate-900/6 to-transparent p-4 rounded-2xl inline-block">
+                    <area.icon className="w-12 h-12 text-slate-900" />
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-amber-500 transition-colors">
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 transition-colors">
                   {area.title}
                 </h3>
                 <p className="text-gray-400 leading-relaxed text-sm">
@@ -482,7 +462,7 @@ const PracticeAreasSection = () => {
                 </p>
 
                 {/* Hover Arrow */}
-                <div className="mt-6 flex items-center text-amber-500 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-0 group-hover:translate-x-2">
+                <div className="mt-6 flex items-center text-slate-900 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-0 group-hover:translate-x-2">
                   <span className="text-sm font-semibold mr-2">Learn more</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
@@ -532,10 +512,10 @@ const ExperienceSection = () => {
   ];
 
   return (
-    <section id="experience" className="relative py-32 bg-gradient-to-b from-slate-900 to-slate-950 overflow-hidden">
+    <section id="experience" className="relative py-32 bg-white overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute top-1/4 left-0 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 left-0 w-72 h-72 bg-gray-200/6 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-gray-200/6 rounded-full blur-3xl" />
 
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 md:max-w-7xl relative z-10">
         <motion.div
@@ -544,10 +524,10 @@ const ExperienceSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-full text-sm font-semibold mb-4">
+          <span className="inline-block px-4 py-2 bg-gray-100 border border-gray-200 text-slate-900 rounded-full text-sm font-semibold mb-4">
             Professional Journey
           </span>
-          <h2 className="text-5xl md:text-6xl font-serif font-bold text-white mb-6">
+          <h2 className="text-5xl md:text-6xl font-serif font-bold text-slate-900 mb-6">
             Experience
           </h2>
           <p className="text-gray-400 text-lg w-full mx-auto max-w-3xl">
@@ -557,7 +537,7 @@ const ExperienceSection = () => {
 
         <div className="relative w-full mx-auto md:max-w-5xl">
           {/* Timeline Line */}
-          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 via-amber-500/50 to-transparent" />
+          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-slate-900 via-slate-900/50 to-transparent" />
 
           <div className="space-y-16">
             {experiences.map((exp, i) => (
@@ -575,33 +555,33 @@ const ExperienceSection = () => {
                 <div className="flex-1 w-full">
                   <motion.div
                     whileHover={{ scale: 1.02, y: -5 }}
-                    className="group relative bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-amber-500/50 rounded-2xl p-8 shadow-2xl hover:shadow-amber-500/20 transition-all duration-300"
+                    className="group relative bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200 hover:border-gray-300 rounded-2xl p-8 shadow-sm hover:shadow-gray-300 transition-all duration-300"
                   >
                     {exp.current && (
                       <div className="absolute top-4 right-4">
                         <span className="relative flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-900 opacity-40"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-slate-900"></span>
                         </span>
                       </div>
                     )}
                     
                     <div className="flex items-center space-x-3 mb-4">
-                      <div className="p-3 bg-amber-500/10 rounded-xl">
-                        <exp.icon className="w-6 h-6 text-amber-500" />
-                      </div>
+                      <div className="p-3 bg-gray-200/6 rounded-xl">
+                            <exp.icon className="w-6 h-6 text-slate-900" />
+                          </div>
                       {exp.current && (
-                        <span className="px-3 py-1 bg-amber-500 text-slate-900 text-xs font-bold rounded-full">
+                        <span className="px-3 py-1 bg-gray-100 text-slate-900 text-xs font-bold rounded-full">
                           CURRENT
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-amber-500 transition-colors">
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2 transition-colors">
                       {exp.title}
                     </h3>
-                    <p className="text-amber-500 font-semibold mb-4 text-lg">{exp.organization}</p>
-                    <p className="text-gray-400 leading-relaxed">{exp.description}</p>
+                    <p className="text-slate-900 font-semibold mb-4 text-lg">{exp.organization}</p>
+                    <p className="text-gray-700 leading-relaxed">{exp.description}</p>
                   </motion.div>
                 </div>
 
@@ -614,14 +594,14 @@ const ExperienceSection = () => {
                     transition={{ delay: i * 0.1 + 0.3, type: "spring" }}
                     className="relative"
                   >
-                    <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50">
+                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center shadow-sm">
                       <exp.icon className="w-10 h-10 text-slate-900" />
                     </div>
                     {exp.current && (
                       <motion.div
                         animate={{ scale: [1, 1.3, 1] }}
                         transition={{ repeat: Infinity, duration: 2 }}
-                        className="absolute inset-0 bg-amber-500 rounded-full opacity-30 blur-md"
+                        className="absolute inset-0 bg-slate-900 rounded-full opacity-20 blur-md"
                       />
                     )}
                   </motion.div>
@@ -641,7 +621,7 @@ const ExperienceSection = () => {
 // Credentials Section
 const CredentialsSection = () => {
   return (
-    <section id="credentials" className="relative py-32 bg-slate-950">
+    <section id="credentials" className="relative py-32 bg-white">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 md:max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -649,10 +629,10 @@ const CredentialsSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-full text-sm font-semibold mb-4">
+          <span className="inline-block px-4 py-2 bg-gray-100 border border-gray-200 text-slate-900 rounded-full text-sm font-semibold mb-4">
             Trust & Authority
           </span>
-          <h2 className="text-5xl md:text-6xl font-serif font-bold text-white mb-6">
+          <h2 className="text-5xl md:text-6xl font-serif font-bold text-slate-900 mb-6">
             Credentials & Facilities
           </h2>
           <p className="text-gray-400 text-lg w-full mx-auto max-w-3xl">
@@ -669,15 +649,15 @@ const CredentialsSection = () => {
             whileHover={{ y: -5 }}
             className="group relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-            <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 group-hover:border-amber-500/50 rounded-3xl p-10 shadow-2xl transition-all duration-300 h-full">
-              <div className="flex items-center space-x-4 mb-8">
-                <div className="p-4 bg-gradient-to-br from-amber-500/20 to-transparent rounded-2xl">
-                  <Award className="w-12 h-12 text-amber-500" />
+            <div className="absolute inset-0 bg-gray-100/6 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
+            <div className="relative bg-white border border-gray-200 group-hover:border-gray-300 rounded-3xl p-10 shadow-sm transition-all duration-300 h-full">
+                <div className="flex items-center space-x-4 mb-8">
+                <div className="p-4 bg-gray-200/6 rounded-2xl">
+                  <Award className="w-12 h-12 text-slate-900" />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold text-white">Enrollment Details</h3>
-                  <p className="text-amber-500 text-sm">Official Bar Registration</p>
+                  <h3 className="text-3xl font-bold text-slate-900">Enrollment Details</h3>
+                  <p className="text-slate-900 text-sm">Official Bar Registration</p>
                 </div>
               </div>
 
@@ -694,16 +674,16 @@ const CredentialsSection = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="flex justify-between items-center py-4 border-b border-slate-700/50 group-hover:border-amber-500/30 transition-colors"
+                    className="flex justify-between items-center py-4 border-b border-slate-700/50 group-hover:border-gray-200 transition-colors"
                   >
                     <span className="text-gray-400 font-medium">{item.label}</span>
-                    <span className="text-white font-semibold text-right">{item.value}</span>
+                    <span className="text-slate-900 font-semibold text-right">{item.value}</span>
                   </motion.div>
                 ))}
               </div>
 
-              <div className="mt-8 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
-                <p className="text-amber-500 text-sm text-center font-medium">
+              <div className="mt-8 p-4 bg-gray-100/6 border border-gray-200 rounded-xl">
+                <p className="text-slate-900 text-sm text-center font-medium">
                   ✓ Verified & Registered Legal Professional
                 </p>
               </div>
@@ -718,15 +698,15 @@ const CredentialsSection = () => {
             whileHover={{ y: -5 }}
             className="group relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-            <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 group-hover:border-amber-500/50 rounded-3xl p-10 shadow-2xl transition-all duration-300 h-full">
-              <div className="flex items-center space-x-4 mb-8">
-                <div className="p-4 bg-gradient-to-br from-amber-500/20 to-transparent rounded-2xl">
-                  <Library className="w-12 h-12 text-amber-500" />
+            <div className="absolute inset-0 bg-gray-100/6 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
+            <div className="relative bg-white border border-gray-200 group-hover:border-gray-300 rounded-3xl p-10 shadow-sm transition-all duration-300 h-full">
+                <div className="flex items-center space-x-4 mb-8">
+                <div className="p-4 bg-gray-200/6 rounded-2xl">
+                  <Library className="w-12 h-12 text-slate-900" />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold text-white">Legal Library</h3>
-                  <p className="text-amber-500 text-sm">Research Infrastructure</p>
+                  <h3 className="text-3xl font-bold text-slate-900">Legal Library</h3>
+                  <p className="text-slate-900 text-sm">Research Infrastructure</p>
                 </div>
               </div>
 
@@ -734,7 +714,7 @@ const CredentialsSection = () => {
                 Comprehensive legal research facility equipped with leading journals and authoritative law reports for thorough case preparation:
               </p>
 
-              <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                 {[
                   'All India Reporter (A.I.R.)',
                   'Supreme Court Cases (S.C.C.)',
@@ -743,16 +723,16 @@ const CredentialsSection = () => {
                   'Madhya Pradesh Judicial Reports (M.P.J.R.)',
                   'Specialized Journals & References'
                 ].map((item, i) => (
-                  <motion.div
+                    <motion.div
                     key={i}
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="flex items-center space-x-3 p-3 bg-slate-800/50 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="flex items-center space-x-3 p-3 bg-gray-100/50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    <BookOpen className="w-5 h-5 text-amber-500 flex-shrink-0" />
-                    <span className="text-gray-300 text-sm">{item}</span>
+                    <BookOpen className="w-5 h-5 text-slate-900 flex-shrink-0" />
+                    <span className="text-gray-600 text-sm">{item}</span>
                   </motion.div>
                 ))}
               </div>
@@ -767,11 +747,11 @@ const CredentialsSection = () => {
 // Contact Section
 const ContactSection = () => {
   return (
-    <section id="contact" className="relative py-32 bg-gradient-to-b from-slate-950 to-slate-900 overflow-hidden">
+    <section id="contact" className="relative py-32 bg-white overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-200/6 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gray-200/6 rounded-full blur-3xl" />
       </div>
 
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 md:max-w-7xl relative z-10">
@@ -781,10 +761,10 @@ const ContactSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-full text-sm font-semibold mb-4">
+          <span className="inline-block px-4 py-2 bg-gray-100 border border-gray-200 text-slate-900 rounded-full text-sm font-semibold mb-4">
             Let's Connect
           </span>
-          <h2 className="text-5xl md:text-6xl font-serif font-bold text-white mb-6">
+          <h2 className="text-5xl md:text-6xl font-serif font-bold text-slate-900 mb-6">
             Get in Touch
           </h2>
           <p className="text-gray-400 text-lg w-full mx-auto max-w-3xl">
@@ -830,12 +810,12 @@ const ContactSection = () => {
                 className="group relative"
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500`} />
-                <div className="relative flex items-start space-x-4 p-6 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 group-hover:border-amber-500/50 rounded-2xl transition-all duration-300">
-                  <div className="flex-shrink-0 p-4 bg-amber-500/10 rounded-xl">
-                    <item.icon className="w-7 h-7 text-amber-500" />
+                <div className="relative flex items-start space-x-4 p-6 bg-white border border-gray-200 group-hover:border-gray-300 rounded-2xl transition-all duration-300">
+                  <div className="flex-shrink-0 p-4 bg-gray-200/6 rounded-xl">
+                    <item.icon className="w-7 h-7 text-slate-900" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-white font-bold text-lg mb-2">{item.title}</h3>
+                    <h3 className="text-slate-900 font-bold text-lg mb-2">{item.title}</h3>
                     <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-line">
                       {item.content}
                     </p>
@@ -852,14 +832,14 @@ const ContactSection = () => {
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-3xl blur-2xl" />
-            <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 border border-amber-500/30 rounded-3xl p-10 shadow-2xl">
+            <div className="absolute inset-0 bg-gray-100/6 rounded-3xl blur-2xl" />
+            <div className="relative bg-white border border-gray-200 rounded-3xl p-10 shadow-sm">
               <div className="text-center mb-8">
-                <div className="inline-block p-4 bg-amber-500/10 rounded-2xl mb-4">
-                  <Scale className="w-12 h-12 text-amber-500" />
+                <div className="inline-block p-4 bg-gray-200/6 rounded-2xl mb-4">
+                  <Scale className="w-12 h-12 text-slate-900" />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-4">Schedule a Consultation</h3>
-                <p className="text-gray-300 leading-relaxed">
+                <h3 className="text-3xl font-bold text-slate-900 mb-4">Schedule a Consultation</h3>
+                <p className="text-gray-600 leading-relaxed">
                   For professional legal representation in the High Court of Madhya Pradesh, reach out to discuss your case with comprehensive legal services.
                 </p>
               </div>
@@ -877,10 +857,10 @@ const ContactSection = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="flex items-center space-x-3 p-3 bg-slate-900/50 rounded-lg"
+                    className="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg"
                   >
-                    <item.icon className="w-5 h-5 text-amber-500" />
-                    <span className="text-gray-300 text-sm">{item.text}</span>
+                    <item.icon className="w-5 h-5 text-slate-900" />
+                    <span className="text-gray-600 text-sm">{item.text}</span>
                   </motion.div>
                 ))}
               </div>
@@ -888,7 +868,7 @@ const ContactSection = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 font-bold rounded-xl hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/30 flex items-center justify-center space-x-2"
+                className="w-full py-4 bg-gray-100 text-slate-900 font-bold rounded-xl hover:bg-gray-200 transition-all duration-300 shadow flex items-center justify-center space-x-2"
               >
                 <span>Contact Now</span>
                 <ArrowRight className="w-5 h-5" />
@@ -907,39 +887,40 @@ const ContactSection = () => {
 
 // Footer
 const Footer = () => {
+  const navigate = useNavigate();
   return (
-    <footer className="relative bg-slate-950 border-t border-slate-800/50">
+    <footer className="relative bg-white border-t border-gray-200">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 md:max-w-7xl">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="p-2 bg-amber-500/10 rounded-lg">
-                <Scale className="w-8 h-8 text-amber-500" />
+              <div className="flex items-center space-x-3 mb-6">
+              <div className="p-2 bg-gray-200/6 rounded-lg">
+                <Scale className="w-8 h-8 text-slate-900" />
               </div>
               <div>
-                <span className="text-2xl font-serif text-white block font-bold">Dr. Preeti Pathak</span>
-                <span className="text-xs text-amber-500">Advocate, High Court of M.P.</span>
+                <span className="text-2xl font-serif text-slate-900 block font-bold">Dr. Preeti Pathak</span>
+                <span className="text-xs text-gray-600">Advocate, High Court of M.P.</span>
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6 w-full max-w-md">
               Committed to delivering justice with integrity, diligence, and professionalism. Providing comprehensive legal services across constitutional, civil, and administrative law.
             </p>
-            <div className="flex items-center space-x-2 text-xs text-gray-500">
-              <Award className="w-4 h-4 text-amber-500" />
+              <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <Award className="w-4 h-4 text-slate-900" />
               <span>Enrollment No: 6052/2023 | M.P. State Bar Council</span>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-6">Quick Links</h3>
+            <h3 className="text-slate-900 font-bold text-lg mb-6">Quick Links</h3>
             <ul className="space-y-3">
               {['About', 'Practice Areas', 'Experience', 'Credentials', 'Contact'].map((item) => (
                 <li key={item}>
                   <button
-                    onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
-                    className="text-gray-400 hover:text-amber-500 transition-colors text-sm flex items-center space-x-2 group"
+                    onClick={() => navigate(`/${item.toLowerCase().replace(' ', '-')}`)}
+                    className="text-gray-400 hover:text-slate-900 transition-colors text-sm flex items-center space-x-2 group"
                   >
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     <span>{item}</span>
@@ -951,11 +932,11 @@ const Footer = () => {
 
           {/* Practice Areas */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-6">Key Areas</h3>
+            <h3 className="text-slate-900 font-bold text-lg mb-6">Key Areas</h3>
             <ul className="space-y-3 text-sm text-gray-400">
               {['Constitutional Law', 'Writ Petitions', 'Service Matters', 'Municipal Law', 'PIL', 'Civil & Criminal'].map((item) => (
                 <li key={item} className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 bg-amber-500 rounded-full" />
+                  <div className="w-1.5 h-1.5 bg-slate-900 rounded-full" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -964,16 +945,16 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-slate-800/50 pt-8">
+        <div className="border-t border-gray-200 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-600 text-sm">
               © {new Date().getFullYear()} Dr. Preeti Pathak (Mishra). All rights reserved.
             </p>
             <div className="flex items-center space-x-6">
-              <a href="tel:+919131080752" className="text-gray-400 hover:text-amber-500 transition-colors p-2 hover:bg-slate-800 rounded-lg">
+              <a href="tel:+919131080752" className="text-gray-600 hover:text-slate-900 transition-colors p-2 hover:bg-gray-100 rounded-lg">
                 <Phone className="w-5 h-5" />
               </a>
-              <a href="mailto:preetimishra22117479@gmail.com" className="text-gray-400 hover:text-amber-500 transition-colors p-2 hover:bg-slate-800 rounded-lg">
+              <a href="mailto:preetimishra22117479@gmail.com" className="text-gray-600 hover:text-slate-900 transition-colors p-2 hover:bg-gray-100 rounded-lg">
                 <Mail className="w-5 h-5" />
               </a>
             </div>
@@ -981,9 +962,9 @@ const Footer = () => {
         </div>
 
         {/* Disclaimer */}
-        <div className="mt-8 p-6 bg-slate-900/50 border border-slate-800/50 rounded-xl">
-          <p className="text-gray-500 text-xs text-center leading-relaxed">
-            <strong className="text-gray-400">Legal Disclaimer:</strong> The information provided on this website is for general informational purposes only and does not constitute legal advice. 
+        <div className="mt-8 p-6 bg-gray-50 border border-gray-200 rounded-xl">
+          <p className="text-gray-600 text-xs text-center leading-relaxed">
+            <strong className="text-gray-700">Legal Disclaimer:</strong> The information provided on this website is for general informational purposes only and does not constitute legal advice. 
             For specific legal guidance related to your situation, please contact the office directly for a professional consultation.
           </p>
         </div>
@@ -993,17 +974,36 @@ const Footer = () => {
 };
 
 // Main App Component
-export default function App() {
+function HomePage() {
   return (
-    <div className="bg-slate-950" >
+    <div className="bg-white">
       <Navigation />
       <HeroSection />
-      <AboutSection />
-      <PracticeAreasSection />
-      <ExperienceSection />
-      <CredentialsSection />
-      <ContactSection />
       <Footer />
     </div>
+  );
+}
+
+function SectionPage({ Component }) {
+  return (
+    <div className="bg-white">
+      <Navigation />
+      <Component />
+      <Footer />
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/about" element={<SectionPage Component={AboutSection} />} />
+      <Route path="/practice" element={<SectionPage Component={PracticeAreasSection} />} />
+      <Route path="/experience" element={<SectionPage Component={ExperienceSection} />} />
+      <Route path="/credentials" element={<SectionPage Component={CredentialsSection} />} />
+      <Route path="/contact" element={<SectionPage Component={ContactSection} />} />
+      <Route path="*" element={<HomePage />} />
+    </Routes>
   );
 }
