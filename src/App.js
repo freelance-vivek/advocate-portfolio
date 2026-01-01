@@ -155,7 +155,7 @@ const HeroSection = () => {
       </div>
 
       {/* Floating Particles (larger & more visible) */}
-      {[...Array(30)].map((_, i) => {
+      {/* {[...Array(30)].map((_, i) => {
         const size = Math.floor(1 + Math.random() * 8); // px
         const initialOpacity = 0.2 + Math.random() * 0.2; // 0.45 - 0.95
         const startX = Math.random() * window.innerWidth;
@@ -184,7 +184,7 @@ const HeroSection = () => {
             }}
           />
         );
-      })}
+      })} */}
 
       <motion.div style={{ y, opacity }} className="relative z-10 text-center px-4 w-full mx-auto md:max-w-6xl">
         {/* Main Title with Gradient */}
