@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Scale, BookOpen, Building2, Award, Mail, Phone, MapPin, GraduationCap, Briefcase, Library, FileText, Users, Shield, ChevronRight, ArrowRight } from 'lucide-react';
+import { Scale, BookOpen, Building2, Award, Mail, Phone, MapPin, GraduationCap, Briefcase, Library, FileText, Users, Shield, X, ChevronRight, ArrowRight } from 'lucide-react';
 
 // Smooth scroll utility
 const scrollToSection = (id) => {
@@ -134,6 +134,7 @@ const Navigation = () => {
 // Hero Section
 const HeroSection = () => {
   const { scrollY } = useScroll();
+  const navigate = useNavigate();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
@@ -153,27 +154,37 @@ const HeroSection = () => {
         }} />
       </div>
 
-      {/* Floating Particles */}
-      {[...Array(20)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-slate-900 rounded-full"
-          initial={{ 
-            x: Math.random() * window.innerWidth, 
-            y: Math.random() * window.innerHeight,
-            opacity: Math.random() * 0.5
-          }}
-          animate={{
-            y: [null, Math.random() * -100],
-            opacity: [null, 0]
-          }}
-          transition={{
-            duration: Math.random() * 3 + 2,
-            repeat: Infinity,
-            delay: Math.random() * 2
-          }}
-        />
-      ))}
+      {/* Floating Particles (larger & more visible) */}
+      {[...Array(30)].map((_, i) => {
+        const size = Math.floor(1 + Math.random() * 8); // px
+        const initialOpacity = 0.2 + Math.random() * 0.2; // 0.45 - 0.95
+        const startX = Math.random() * window.innerWidth;
+        const startY = Math.random() * window.innerHeight;
+        const driftX = (Math.random() - 0.5) * 40; // horizontal drift
+        const rise = 60 + Math.random() * 120; // rise distance
+        const duration = 3 + Math.random() * 3;
+
+        return (
+          <motion.div
+            key={i}
+            style={{ width: size, height: size, left: startX, top: startY, backgroundColor: 'rgba(15,23,42,0.95)' }}
+            className="absolute rounded-full"
+            initial={{ opacity: initialOpacity, scale: 1 }}
+            animate={{
+              y: -rise,
+              x: driftX,
+              opacity: [initialOpacity, 0.05],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{
+              duration,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: 'easeInOut'
+            }}
+          />
+        );
+      })}
 
       <motion.div style={{ y, opacity }} className="relative z-10 text-center px-4 w-full mx-auto md:max-w-6xl">
         {/* Main Title with Gradient */}
@@ -236,7 +247,7 @@ const HeroSection = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => scrollToSection('contact')}
+            onClick={() => navigate('/contact')}
             className="group px-8 py-4 bg-gray-100 text-slate-900 font-bold rounded-xl hover:bg-gray-200 transition-all duration-300 shadow-lg flex items-center space-x-2"
           >
             <span>Schedule Consultation</span>
@@ -246,7 +257,7 @@ const HeroSection = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => scrollToSection('practice')}
+            onClick={() => navigate('/practice')}
             className="px-8 py-4 bg-transparent border-2 border-gray-300 text-slate-900 font-semibold rounded-xl hover:bg-gray-200 hover:text-slate-900 transition-all duration-300"
           >
             View Practice Areas
@@ -266,9 +277,18 @@ const AboutSection = () => {
       {/* Background Decoration */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gray-200/6 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gray-200/6 rounded-full blur-3xl" />
-
+ <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="inline-block mb-4 flex justify-center w-full"
+            >
+              <span className="px-4 py-2 bg-gray-100 border border-gray-200 text-slate-900 rounded-full text-sm font-semibold justify-center flex">
+                Professional Profile
+              </span>
+            </motion.div>
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 md:max-w-7xl relative z-10">
-        <motion.div
+          <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -276,44 +296,57 @@ const AboutSection = () => {
           className="grid lg:grid-cols-2 gap-16 items-center"
         >
           {/* Left Content */}
-          <div>
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="inline-block mb-4"
-            >
-              <span className="px-4 py-2 bg-gray-100 border border-gray-200 text-slate-900 rounded-full text-sm font-semibold">
-                Professional Profile
-              </span>
-            </motion.div>
-
-            <h2 className="text-5xl md:text-6xl font-serif font-bold text-slate-900 mb-6 leading-tight">
-              Excellence in
-              <span className="block bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                Legal Advocacy
-              </span>
-            </h2>
-
-            <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
-              <p>
-                With a strong academic foundation spanning multiple disciplines and diverse professional experience, I bring comprehensive expertise in litigation, constitutional law, service matters, and municipal governance.
-              </p>
-              <p>
-                My practice is built on a foundation of integrity, diligence, and an unwavering commitment to justice. I believe in delivering results through thorough legal research, strategic advocacy, and a deep understanding of both statutory frameworks and practical implications.
-              </p>
+          
+            <div className="mb-6">
               
-              {/* Quote Box */}
-              <div className="relative pl-6 border-l-4 border-gray-300 py-4">
-                <div className="absolute -left-3 top-0 w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center">
-                  <span className="text-slate-900 text-xs font-bold">"</span>
-                </div>
-                <p className="text-gray-700 font-medium italic text-xl">
-                  Justice delayed is justice denied. I strive to provide timely, effective, and transparent legal representation.
-                </p>
+              {/* Mobile: stacked image */}
+              <img
+                src={process.env.PUBLIC_URL + '/profile.jpeg'}
+                alt="Dr. Preeti Pathak"
+                loading="lazy"
+                className="block lg:hidden mx-auto mb-6 w-40 h-40 md:w-48 md:h-48 rounded-full object-cover border-4 border-gray-100 shadow-md"
+              />
+
+              {/* Desktop: floated circular image with shape-outside so text wraps */}
+              <div
+                className="hidden lg:block lg:float-left lg:mr-8 lg:mb-4"
+                style={{ width: '200px', height: '200px', shapeOutside: 'circle(50%)', WebkitShapeOutside: 'circle(50%)', clipPath: 'circle(50%)' }}
+              >
+                <img
+                  src={process.env.PUBLIC_URL + '/profile.jpeg'}
+                  alt="Dr. Preeti Pathak"
+                  loading="lazy"
+                  className="w-full h-full rounded-full object-cover border-4 border-gray-100 shadow-md"
+                />
               </div>
+
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-slate-900 mb-4 leading-tight">
+                Excellence in
+                <span className="block bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                  Legal Advocacy
+                </span>
+              </h2>
+
+              <div className="space-y-4 text-gray-700 leading-relaxed text-lg max-w-2xl">
+                <p>
+                  With a strong academic foundation spanning multiple disciplines and diverse professional experience, I bring comprehensive expertise in litigation, constitutional law, service matters, and municipal governance.
+                </p>
+                <p>
+                  My practice is built on a foundation of integrity, diligence, and an unwavering commitment to justice. I believe in delivering results through thorough legal research, strategic advocacy, and a deep understanding of both statutory frameworks and practical implications.
+                </p>
+
+                <div className="relative pl-6 border-l-4 border-gray-300 py-4">
+                  <div className="absolute -left-3 top-0 w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center">
+                    <span className="text-slate-900 text-xs font-bold">"</span>
+                  </div>
+                  <p className="text-gray-700 font-medium italic text-xl">
+                    Justice delayed is justice denied. I strive to provide timely, effective, and transparent legal representation.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ clear: 'both' }} />
             </div>
-          </div>
 
           {/* Right Content - Cards */}
           <motion.div
@@ -869,6 +902,7 @@ const ContactSection = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full py-4 bg-gray-100 text-slate-900 font-bold rounded-xl hover:bg-gray-200 transition-all duration-300 shadow flex items-center justify-center space-x-2"
+                onClick={() => window.dispatchEvent(new Event('openContactModal'))}
               >
                 <span>Contact Now</span>
                 <ArrowRight className="w-5 h-5" />
@@ -884,6 +918,173 @@ const ContactSection = () => {
     </section>
   );
 };
+
+// WhatsApp Floating Badge
+const WhatsAppBadge = () => {
+  const phone = '918982157429';
+  const text = encodeURIComponent('Hello Dr. Preeti, I would like to schedule a consultation.');
+  const href = `https://wa.me/${phone}?text=${text}`;
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label="Chat on WhatsApp"
+      className="fixed bottom-6 right-6 z-50 flex items-center space-x-3 bg-[#25D366] hover:bg-[#1DA851] text-white px-3 py-2 rounded-full shadow-lg transition-colors ring-[#25D366]/40 focus:outline-none"
+    >
+      <span className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white/10">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
+          <path d="M20.52 3.48A11.92 11.92 0 0012 0C5.372 0 .02 5.352 0 12c0 2.115.555 4.188 1.606 6.028L0 24l6.297-1.644A11.942 11.942 0 0012 24c6.628 0 12-5.372 12-12 0-3.2-1.246-6.2-3.48-8.52zM12 21.5c-1.6 0-3.127-.355-4.5-1.03l-.32-.16-3.74.98.98-3.65-.21-.34A9.5 9.5 0 012.5 12 9.5 9.5 0 0112 2.5c5.243 0 9.5 4.257 9.5 9.5S17.243 21.5 12 21.5z" />
+          <path d="M17.1 14.08c-.29-.15-1.71-.84-1.98-.94-.27-.09-.47-.14-.67.15s-.76.94-.93 1.13c-.17.19-.33.21-.62.07-.29-.15-1.23-.45-2.34-1.44-.86-.76-1.44-1.7-1.61-1.99-.17-.28-.02-.43.13-.58.13-.13.29-.33.43-.5.14-.17.19-.29.29-.48.09-.19.05-.36-.02-.5-.07-.14-.67-1.61-.92-2.2-.24-.57-.49-.5-.67-.51l-.57-.01c-.19 0-.5.07-.77.36-.27.29-1.03 1.01-1.03 2.45 0 1.44 1.05 2.84 1.2 3.04.15.19 2.08 3.36 5.02 4.7 2.94 1.34 2.94.9 3.47.84.53-.06 1.71-.7 1.95-1.37.24-.67.24-1.25.17-1.37-.07-.12-.27-.19-.56-.34z" />
+        </svg>
+      </span>
+    </a>
+  );
+};
+
+// Simple Toasts manager — listens for 'appToast' events
+const Toasts = () => {
+  const [toasts, setToasts] = useState([]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      const id = Date.now();
+      const { type = 'info', message = '' } = e.detail || {};
+      setToasts((t) => [...t, { id, type, message }]);
+      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000);
+    };
+    window.addEventListener('appToast', handler);
+    return () => window.removeEventListener('appToast', handler);
+  }, []);
+
+  return (
+    <div className="fixed right-6 top-6 z-[9999] flex flex-col gap-3 pointer-events-none" aria-live="polite" aria-atomic="true">
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          role="status"
+          className={`max-w-sm px-4 py-3 rounded-lg shadow-lg text-sm text-white pointer-events-auto ${toast.type === 'success' ? 'bg-green-600' : toast.type === 'error' ? 'bg-red-600' : 'bg-gray-700'}`}
+        >
+          {toast.message}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Contact Modal — listens for 'openContactModal' event
+const ContactModal = () => {
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+
+  useEffect(() => {
+    const openHandler = () => setOpen(true);
+    window.addEventListener('openContactModal', openHandler);
+    return () => window.removeEventListener('openContactModal', openHandler);
+  }, []);
+
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim()) e.name = 'Name is required';
+    if (!form.email.trim()) e.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email';
+    if (!form.phone.trim()) e.phone = 'Phone is required';
+    else if (!/^[0-9+\-\s()]{6,}$/.test(form.phone)) e.phone = 'Invalid phone';
+    if (!form.message.trim()) e.message = 'Message is required';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  // Live validity check (does not set error messages)
+  useEffect(() => {
+    const ok = () => {
+      if (!form.name.trim()) return false;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return false;
+      if (!/^[0-9+\-\s()]{6,}$/.test(form.phone)) return false;
+      if (!form.message.trim()) return false;
+      return true;
+    };
+    setIsValid(ok());
+  }, [form]);
+
+  const submit = async (ev) => {
+    ev.preventDefault();
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        window.dispatchEvent(new CustomEvent('appToast', { detail: { type: 'success', message: 'Message sent — we will contact you soon.' } }));
+        setOpen(false);
+        setForm({ name: '', email: '', phone: '', message: '' });
+      } else {
+        window.dispatchEvent(new CustomEvent('appToast', { detail: { type: 'error', message: 'Failed to send message. Please try again.' } }));
+      }
+    } catch (err) {
+      window.dispatchEvent(new CustomEvent('appToast', { detail: { type: 'error', message: 'Network error. Please try again.' } }));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+      <div className="relative bg-white rounded-2xl p-6 w-full max-w-2xl mx-4 shadow-xl">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-bold">Contact Us</h3>
+          <button onClick={() => setOpen(false)} className="text-gray-600 hover:text-gray-900" aria-label="Close">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={submit} className="space-y-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700">Name</label>
+            <input required aria-required="true" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={`mt-1 block w-full rounded-md border p-2 ${errors.name ? 'border-red-500' : 'border-gray-200'}`} />
+            {errors.name && <div className="text-xs text-red-600 mt-1">{errors.name}</div>}
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">Email</label>
+            <input required aria-required="true" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={`mt-1 block w-full rounded-md border p-2 ${errors.email ? 'border-red-500' : 'border-gray-200'}`} />
+            {errors.email && <div className="text-xs text-red-600 mt-1">{errors.email}</div>}
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">Phone</label>
+            <input required aria-required="true" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={`mt-1 block w-full rounded-md border p-2 ${errors.phone ? 'border-red-500' : 'border-gray-200'}`} />
+            {errors.phone && <div className="text-xs text-red-600 mt-1">{errors.phone}</div>}
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">Message</label>
+            <textarea required aria-required="true" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={4} className={`mt-1 block w-full rounded-md border p-2 ${errors.message ? 'border-red-500' : 'border-gray-200'}`} />
+            {errors.message && <div className="text-xs text-red-600 mt-1">{errors.message}</div>}
+          </div>
+
+          <div className="flex justify-end space-x-3">
+            <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 rounded-md border border-gray-200">Cancel</button>
+            <button type="submit" disabled={!isValid || submitting} className={`px-4 py-2 rounded-md text-white ${(!isValid || submitting) ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#25D366] hover:bg-[#1DA851]'}`}>
+              {submitting ? 'Sending...' : 'Send Message'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 
 // Footer
 const Footer = () => {
@@ -980,6 +1181,9 @@ function HomePage() {
       <Navigation />
       <HeroSection />
       <Footer />
+      <WhatsAppBadge />
+      <ContactModal />
+      <Toasts />
     </div>
   );
 }
@@ -990,6 +1194,9 @@ function SectionPage({ Component }) {
       <Navigation />
       <Component />
       <Footer />
+      <WhatsAppBadge />
+      <ContactModal />
+      <Toasts />
     </div>
   );
 }
